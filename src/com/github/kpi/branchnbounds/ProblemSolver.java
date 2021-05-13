@@ -17,17 +17,17 @@ public class ProblemSolver {
             {0, 0, 0, 0, 0, 4, 0},
             {0, 0, 0, 0, 0, 0, 1},
             {0, 0, 0, 0, 0, 0, 0}};
-    private final ArrayList<String> finalPath = new ArrayList<>();
+    private final ArrayList<String> finalPath = new ArrayList<>(); //todo are we really, like REALLY need this?
     private final HashMap<Integer, Integer> currentPath = new HashMap<>();
     private final HashMap<Integer, Integer> currentNodeWeights = new HashMap<>(); // node index, node weight
+    private final HashMap<Integer, Integer> previousChildNodes = new HashMap<>(); // todo check this out
     private int previousNode = 0;
     private int currentNode = 0;
-    private int currentSize = 0; // current size represents the amount of the connected nodes //todo check if this really necessary
+    private int currentSize = 0; // current size represents the amount of the connected nodes //todo check if this really necessary upd. wtf why it's still here
 
     public ProblemSolver() {
         printMatrix();
         currentNodeWeights.put(currentNode, 0); // set default node as 0 (a) and it's weight to 0;
-
         worker();
     }
 
@@ -35,7 +35,7 @@ public class ProblemSolver {
     private void worker() {
         updateCurrentPath(previousNode);
         updateCurrentNodeWeights(previousNode,currentNode);
-        printDebugData();
+//        printDebugData();
         while (!currentNodeWeights.containsKey(6)) {
             updateState();
         }
@@ -46,10 +46,12 @@ public class ProblemSolver {
 
     private void updateState() {
         updateCurrentNodeWeights(previousNode, currentNode);
+        printHumanReadablePrevChildNodes();
         updateNodeTracking();
+        updatePreviousChildNodeMap(previousNode);
         updateCurrentPath(currentNode);
         updateNodesMap();
-        printDebugData();
+
     }
 
     private void updateNodesMap() {
@@ -66,7 +68,7 @@ public class ProblemSolver {
         AtomicInteger minIndex = new AtomicInteger(Integer.MAX_VALUE);
 
         currentNodeWeights.forEach((k, v) -> {
-            // we need to exclude values which is already in path.
+            // we need to exclude values which greater than values that is already in path.
             if (k != 0) {
                 if (k < minIndex.get()) {
                     minIndex.set(k);
@@ -76,18 +78,25 @@ public class ProblemSolver {
         currentNode = minIndex.get();
     }
 
+    private void updatePreviousChildNodeMap(int previousNode) {
+        previousChildNodes.clear();
+        Map<Integer, Integer> prevChildNodes = findChildNodes(previousNode);
+        prevChildNodes.forEach(previousChildNodes::put);
+
+    }
+
     private Map<Integer, Integer> findChildNodes(int currentNode) {
         Map<Integer, Integer> childNodes = new HashMap<>();
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[currentNode][i] != 0) {
                 childNodes.put(i, matrix[currentNode][i]);
-                currentSize++; //todo check if this really necessary
+                currentSize++; //todo check if this really necessary upd. wtf why it's still here
             }
         }
         return childNodes;
     }
 
-    //todo check if we really need parentNode
+    //todo check if we really need parentNode upd. wtf why it's still here
     private void updateCurrentNodeWeights(int parentNode, int currentNode) {
         Map<Integer, Integer> tempMap = findChildNodes(currentNode);
         tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentPath.get(currentNode)));
@@ -116,6 +125,13 @@ public class ProblemSolver {
 
     private void printHumanReadablePath() {
         currentPath.forEach((k, v) -> System.out.println(letterToInteger.get(k) + " total weight = " + v + " |"));
+    }
+
+    private void printHumanReadablePrevChildNodes() {
+        System.out.println("PREV CHILD NODES START for node " + letterToInteger.get(previousNode));
+        previousChildNodes.forEach((k, v) -> System.out.print(letterToInteger.get(k) + " = " + v + " | "));
+        System.out.println("\nPREV CHILD NODES END");
+
     }
 
     public void printMatrix() {

@@ -30,11 +30,11 @@ public class ProblemSolver {
         }
     }
 
-    private Map<Integer, Integer> findChildNodes(int previousNode, int currentNode) {
+    private Map<Integer, Integer> findChildNodes(int parentNode, int currentNode) {
         Map<Integer, Integer> childNodes= new HashMap<>();
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[currentNode][i] != 0) {
-                childNodes.put(i, calculateNodeWeight(previousNode, currentNode));
+                childNodes.put(i, calculateNodeWeight(parentNode, currentNode));
             }
         }
 

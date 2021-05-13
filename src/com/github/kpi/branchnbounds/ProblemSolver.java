@@ -17,8 +17,8 @@ public class ProblemSolver {
             {0, 0, 0, 0, 0, 4, 0},
             {0, 0, 0, 0, 0, 0, 1},
             {0, 0, 0, 0, 0, 0, 0}};
-    private final ArrayList<Integer> finalPath = new ArrayList<>();
-    private final ArrayList<Integer> currentPath = new ArrayList<>();
+    private final ArrayList<String> finalPath = new ArrayList<>();
+    private final HashMap<Integer, Integer> currentPath = new HashMap<>();
     private final HashMap<Integer, Integer> currentNodeWeights = new HashMap<>(); // node index, node weight
     private int previousNode = 0;
     private int currentNode = 0;
@@ -33,14 +33,32 @@ public class ProblemSolver {
 
 
     private void worker() {
-        updateCurrentNodeWeights(currentNode, 0);
+        updateCurrentPath(previousNode);
+        updateCurrentNodeWeights(previousNode,currentNode);
+        printDebugData();
         while (!currentNodeWeights.containsKey(6)) {
-            printDebugData();
-            updateCurrentNodeWeights(previousNode, currentNode);
-            updateNodeTracking();
-            printDebugData();
-            break; //todo fix cycle -> now it's going to infinite cycle --> possible fix: make new currentNodeWeight map every time
+            updateState();
         }
+        updateState();
+        updateState();
+        printHumanReadablePath();
+    }
+
+    private void updateState() {
+        updateCurrentNodeWeights(previousNode, currentNode);
+        updateNodeTracking();
+        updateCurrentPath(currentNode);
+        updateNodesMap();
+        printDebugData();
+    }
+
+    private void updateNodesMap() {
+        clearCurrentNodeWeights();
+        updateCurrentNodeWeights(previousNode,currentNode);
+    }
+
+    private void updateCurrentPath(int node) {
+        currentPath.put(node, currentNodeWeights.get(node));
     }
 
     private void updateNodeTracking() {
@@ -48,13 +66,13 @@ public class ProblemSolver {
         AtomicInteger minIndex = new AtomicInteger(Integer.MAX_VALUE);
 
         currentNodeWeights.forEach((k, v) -> {
+            // we need to exclude values which is already in path.
             if (k != 0) {
                 if (k < minIndex.get()) {
                     minIndex.set(k);
                 }
             }
         });
-
         currentNode = minIndex.get();
     }
 
@@ -66,14 +84,17 @@ public class ProblemSolver {
                 currentSize++; //todo check if this really necessary
             }
         }
-
         return childNodes;
     }
 
     //todo check if we really need parentNode
     private void updateCurrentNodeWeights(int parentNode, int currentNode) {
         Map<Integer, Integer> tempMap = findChildNodes(currentNode);
-        tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentNodeWeights.get(currentNode)));
+        tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentPath.get(currentNode)));
+    }
+
+    private void clearCurrentNodeWeights() {
+        currentNodeWeights.clear();
     }
 
     private void printDebugData() {
@@ -91,6 +112,10 @@ public class ProblemSolver {
 
     private void printHumanReadableCurrentNode() {
         System.out.println("Current node: " + letterToInteger.get(currentNode));
+    }
+
+    private void printHumanReadablePath() {
+        currentPath.forEach((k, v) -> System.out.println(letterToInteger.get(k) + " total weight = " + v + " |"));
     }
 
     public void printMatrix() {

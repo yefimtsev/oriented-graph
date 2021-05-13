@@ -1,6 +1,7 @@
 package com.github.kpi.branchnbounds;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,7 +17,7 @@ public class ProblemSolver {
             {0, 0, 0, 0, 0, 4, 0},
             {0, 0, 0, 0, 0, 0, 1},
             {0, 0, 0, 0, 0, 0, 0}};
-    private final HashMap<Integer, Integer> currentPath = new HashMap<>();
+    private final LinkedHashMap<Integer, Integer> currentPath = new LinkedHashMap<>();
     private final HashMap<Integer, Integer> currentNodeWeights = new HashMap<>(); // node index, node weight
     private final HashMap<Integer, HashMap<Integer, Integer>> previousChildNodes = new HashMap<>();
     private int previousNode = 0;
@@ -32,7 +33,6 @@ public class ProblemSolver {
     private void worker() {
         updateCurrentPath(previousNode);
         updateCurrentNodeWeights(currentNode);
-//        printDebugData();
         while (!currentNodeWeights.containsKey(6)) {
             updateState();
         }
@@ -42,14 +42,13 @@ public class ProblemSolver {
     }
 
     private void updateState() {
-        updateCurrentNodeWeights(currentNode);
-        printHumanReadableCurrentNode();
-        printHumanReadablePrevChildNodes();
         updateNodeTracking();
         updatePreviousChildNodeMap(previousNode);
         updateCurrentPath(currentNode);
         updateNodesMap();
-
+//        printHumanReadableCurrentNode();
+//        printHumanReadablePath();
+//        printDebugData(); //debug
     }
 
     private void updateNodesMap() {
@@ -74,7 +73,13 @@ public class ProblemSolver {
                 }
             });
         }
-
+        //todo peek into - maybe it can be simplified and FINALLY SOLVED
+//        System.out.println("------");
+//        System.out.println("possible if here. currentpath.get(currentNode): " + currentPath.get(currentNode));
+//        System.out.println("possible if here. currentpath.get(previousNode): " + currentPath.get(previousNode));
+//        printHumanReadablePrevChildNodes();
+//        printHumanReadablePath();
+//        System.out.println("------");
 
         currentNodeWeights.forEach((k, v) -> {
             // we need to exclude values which greater than values that is already in path.
@@ -85,20 +90,24 @@ public class ProblemSolver {
             }
         });
         //todo cleanup this mess
-        System.out.println();
-        System.out.println("updateNodeTracking HERE:");
-        System.out.println("CurrentNodesMin: " + currentNodeWeights.get(currentNodesMin.get()));
-        if (previousChildNodes.get(previousNode) != null)
-            System.out.println("PreviousNodesMin: " + previousChildNodes.get(previousNode).get(previousNodesMin.get()));
-        System.out.println("updateNodeTracking DONE:");
-        System.out.println();
+//        System.out.println();
+//        System.out.println("updateNodeTracking HERE:");
+//        System.out.println("CurrentNodesMin: " + currentNodeWeights.get(currentNodesMin.get()));
+//        if (previousChildNodes.get(previousNode) != null)
+//            System.out.println("PreviousNodesMin: " + previousChildNodes.get(previousNode).get(previousNodesMin.get()));
+//        System.out.println("updateNodeTracking DONE:");
+//        System.out.println();
         previousNode = currentNode;
         currentNode = currentNodesMin.get();
 
     }
 
+    // stolen from SO
+    public static Integer FindLastEntryWithReduceMethod(LinkedHashMap<Integer, Integer> linkedHashMap) {
+        return linkedHashMap.entrySet().stream().reduce((first, second) -> second).orElse(null).getValue();
+    }
+
     private void updatePreviousChildNodeMap(int previousNode) {
-//        previousChildNodes.clear();
         HashMap<Integer, Integer> temp = new HashMap<>();
         Map<Integer, Integer> prevChildNodes = findChildNodes(previousNode);
         prevChildNodes.forEach((k, v) -> temp.put(k, v + currentPath.get(previousNode)));
@@ -147,14 +156,14 @@ public class ProblemSolver {
     }
 
     private void printHumanReadablePrevChildNodes() {
-        System.out.println("PREV CHILD NODES START for node " + letterToInteger.get(previousNode));
+        System.out.println("PREV CHILD NODES START for node " + letterToInteger.get(currentNode));
         previousChildNodes.forEach((k, v) -> {
 
             System.out.print(letterToInteger.get(k) + " = ");
             v.forEach((n, p) -> System.out.print(" {" + letterToInteger.get(n) + "=" + p + "} "));
             System.out.println();
         });
-        System.out.println("\nPREV CHILD NODES END\n\n");
+        System.out.println("PREV CHILD NODES END");
 
     }
 

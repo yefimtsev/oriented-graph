@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 // a = 0, g = 6
 public class ProblemSolver {
 
-    private final HashMap<Integer, String> letterToInteger = createHashMap();
+    private final HashMap<Integer, String> letterToInteger = createLettersToIntegersMap();
     private final int[][] matrix = {
             {0, 2, 4, 5, 0, 0, 0},
             {0, 0, 1, 0, 5, 12, 0},
@@ -102,7 +102,7 @@ public class ProblemSolver {
         }
     }
 
-    private HashMap<Integer, String> createHashMap() {
+    private HashMap<Integer, String> createLettersToIntegersMap() {
         HashMap<Integer, String> temp = new HashMap<>();
         temp.put(0, "a");
         temp.put(1, "b");

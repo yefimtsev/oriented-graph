@@ -19,7 +19,7 @@ public class ProblemSolver {
         printMatrix();
         currentNodeWeights.put(0, 0); // set default node as 0 (a) and it's weight to 0;
         currentNodeWeights.put(1, 2); // set default node as 1 (b) and it's weight to 2;
-        updateCurrentNodeWeights(0,1);
+        updateCurrentNodeWeights(0, 1);
         updateCurrentNodeWeights(1, 2);
         printHumanReadableNodes();
     }
@@ -44,7 +44,7 @@ public class ProblemSolver {
     }
 
     private Map<Integer, Integer> findChildNodes(int currentNode) {
-        Map<Integer, Integer> childNodes= new HashMap<>();
+        Map<Integer, Integer> childNodes = new HashMap<>();
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[currentNode][i] != 0) {
                 childNodes.put(i, matrix[currentNode][i]);
@@ -59,7 +59,6 @@ public class ProblemSolver {
         Map<Integer, Integer> tempMap = findChildNodes(currentNode);
         tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentNodeWeights.get(currentNode)));
     }
-
 
 
     private final HashMap<Integer, String> letterToInteger = createHashMap();

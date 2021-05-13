@@ -1,6 +1,5 @@
 package com.github.kpi.branchnbounds;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,13 +16,11 @@ public class ProblemSolver {
             {0, 0, 0, 0, 0, 4, 0},
             {0, 0, 0, 0, 0, 0, 1},
             {0, 0, 0, 0, 0, 0, 0}};
-    private final ArrayList<String> finalPath = new ArrayList<>(); //todo are we really, like REALLY need this?
     private final HashMap<Integer, Integer> currentPath = new HashMap<>();
     private final HashMap<Integer, Integer> currentNodeWeights = new HashMap<>(); // node index, node weight
     private final HashMap<Integer, Integer> previousChildNodes = new HashMap<>(); // todo check this out
     private int previousNode = 0;
     private int currentNode = 0;
-    private int currentSize = 0; // current size represents the amount of the connected nodes //todo check if this really necessary upd. wtf why it's still here
 
     public ProblemSolver() {
         printMatrix();
@@ -34,7 +31,7 @@ public class ProblemSolver {
 
     private void worker() {
         updateCurrentPath(previousNode);
-        updateCurrentNodeWeights(previousNode,currentNode);
+        updateCurrentNodeWeights(currentNode);
 //        printDebugData();
         while (!currentNodeWeights.containsKey(6)) {
             updateState();
@@ -45,7 +42,7 @@ public class ProblemSolver {
     }
 
     private void updateState() {
-        updateCurrentNodeWeights(previousNode, currentNode);
+        updateCurrentNodeWeights(currentNode);
         printHumanReadablePrevChildNodes();
         updateNodeTracking();
         updatePreviousChildNodeMap(previousNode);
@@ -56,7 +53,7 @@ public class ProblemSolver {
 
     private void updateNodesMap() {
         clearCurrentNodeWeights();
-        updateCurrentNodeWeights(previousNode,currentNode);
+        updateCurrentNodeWeights(currentNode);
     }
 
     private void updateCurrentPath(int node) {
@@ -90,14 +87,13 @@ public class ProblemSolver {
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[currentNode][i] != 0) {
                 childNodes.put(i, matrix[currentNode][i]);
-                currentSize++; //todo check if this really necessary upd. wtf why it's still here
             }
         }
         return childNodes;
     }
 
     //todo check if we really need parentNode upd. wtf why it's still here
-    private void updateCurrentNodeWeights(int parentNode, int currentNode) {
+    private void updateCurrentNodeWeights(int currentNode) {
         Map<Integer, Integer> tempMap = findChildNodes(currentNode);
         tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentPath.get(currentNode)));
     }

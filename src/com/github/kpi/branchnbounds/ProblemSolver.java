@@ -129,13 +129,11 @@ public class ProblemSolver {
 
     private void printHumanReadablePrevChildNodes() {
         System.out.println("PREV CHILD NODES START for node " + letterToInteger.get(previousNode));
-//        previousChildNodes.forEach((k, v) -> {
-//
-//           System.out.print(letterToInteger.get(k) + " = ");
-//           v.forEach((n, p) -> System.out.print("{" + letterToInteger.get(n) + "=" + p + "}"));
-//            System.out.print(" |");
-//        });
-        System.out.println(previousChildNodes);
+        previousChildNodes.forEach((k, v) -> {
+
+            System.out.print(letterToInteger.get(k) + " = ");
+            v.forEach((n, p) -> System.out.print(" {" + letterToInteger.get(n) + "=" + p + "} "));
+        });
         System.out.println("\nPREV CHILD NODES END\n\n");
 
     }

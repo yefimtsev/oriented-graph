@@ -98,7 +98,7 @@ public class ProblemSolver {
     }
 
     private void updatePreviousChildNodeMap(int previousNode) {
-        previousChildNodes.clear();
+//        previousChildNodes.clear();
         HashMap<Integer, Integer> temp = new HashMap<>();
         Map<Integer, Integer> prevChildNodes = findChildNodes(previousNode);
         prevChildNodes.forEach((k, v) -> temp.put(k, v + currentPath.get(previousNode)));
@@ -152,6 +152,7 @@ public class ProblemSolver {
 
             System.out.print(letterToInteger.get(k) + " = ");
             v.forEach((n, p) -> System.out.print(" {" + letterToInteger.get(n) + "=" + p + "} "));
+            System.out.println();
         });
         System.out.println("\nPREV CHILD NODES END\n\n");
 

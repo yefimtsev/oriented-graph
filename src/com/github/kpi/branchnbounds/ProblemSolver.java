@@ -43,9 +43,8 @@ public class ProblemSolver {
 
     private void updateState() {
         updateCurrentNodeWeights(currentNode);
+        printHumanReadableCurrentNode();
         printHumanReadablePrevChildNodes();
-//        printHumanReadableCurrentNode();
-//        printHumanReadableNodes();
         updateNodeTracking();
         updatePreviousChildNodeMap(previousNode);
         updateCurrentPath(currentNode);
@@ -63,25 +62,46 @@ public class ProblemSolver {
     }
 
     private void updateNodeTracking() {
-        previousNode = currentNode;
-        AtomicInteger minIndex = new AtomicInteger(Integer.MAX_VALUE);
+        AtomicInteger currentNodesMin = new AtomicInteger(Integer.MAX_VALUE);
+        AtomicInteger previousNodesMin = new AtomicInteger(Integer.MAX_VALUE);
+
+        if (previousChildNodes.get(previousNode) != null) {
+            previousChildNodes.get(previousNode).forEach((k, v) -> {
+                if (k != 0) {
+                    if (k < previousNodesMin.get()) {
+                        previousNodesMin.set(k);
+                    }
+                }
+            });
+        }
+
 
         currentNodeWeights.forEach((k, v) -> {
             // we need to exclude values which greater than values that is already in path.
             if (k != 0) {
-                if (k < minIndex.get()) {
-                    minIndex.set(k);
+                if (k < currentNodesMin.get()) {
+                    currentNodesMin.set(k);
                 }
             }
         });
-        currentNode = minIndex.get();
+        //todo cleanup this mess
+        System.out.println();
+        System.out.println("updateNodeTracking HERE:");
+        System.out.println("CurrentNodesMin: " + currentNodeWeights.get(currentNodesMin.get()));
+        if (previousChildNodes.get(previousNode) != null)
+            System.out.println("PreviousNodesMin: " + previousChildNodes.get(previousNode).get(previousNodesMin.get()));
+        System.out.println("updateNodeTracking DONE:");
+        System.out.println();
+        previousNode = currentNode;
+        currentNode = currentNodesMin.get();
+
     }
 
     private void updatePreviousChildNodeMap(int previousNode) {
         previousChildNodes.clear();
         HashMap<Integer, Integer> temp = new HashMap<>();
         Map<Integer, Integer> prevChildNodes = findChildNodes(previousNode);
-        prevChildNodes.forEach(temp::put);
+        prevChildNodes.forEach((k, v) -> temp.put(k, v + currentPath.get(previousNode)));
         previousChildNodes.put(previousNode, temp);
     }
 
@@ -95,7 +115,6 @@ public class ProblemSolver {
         return childNodes;
     }
 
-    //todo check if we really need parentNode upd. wtf why it's still here
     private void updateCurrentNodeWeights(int currentNode) {
         Map<Integer, Integer> tempMap = findChildNodes(currentNode);
         tempMap.forEach((k, v) -> currentNodeWeights.put(k, v + currentPath.get(currentNode)));

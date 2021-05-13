@@ -18,7 +18,7 @@ public class ProblemSolver {
             {0, 0, 0, 0, 0, 0, 0}};
     private final HashMap<Integer, Integer> currentPath = new HashMap<>();
     private final HashMap<Integer, Integer> currentNodeWeights = new HashMap<>(); // node index, node weight
-    private final HashMap<Integer, Integer> previousChildNodes = new HashMap<>(); // todo check this out
+    private final HashMap<Integer, HashMap<Integer, Integer>> previousChildNodes = new HashMap<>();
     private int previousNode = 0;
     private int currentNode = 0;
 
@@ -44,6 +44,8 @@ public class ProblemSolver {
     private void updateState() {
         updateCurrentNodeWeights(currentNode);
         printHumanReadablePrevChildNodes();
+//        printHumanReadableCurrentNode();
+//        printHumanReadableNodes();
         updateNodeTracking();
         updatePreviousChildNodeMap(previousNode);
         updateCurrentPath(currentNode);
@@ -77,9 +79,10 @@ public class ProblemSolver {
 
     private void updatePreviousChildNodeMap(int previousNode) {
         previousChildNodes.clear();
+        HashMap<Integer, Integer> temp = new HashMap<>();
         Map<Integer, Integer> prevChildNodes = findChildNodes(previousNode);
-        prevChildNodes.forEach(previousChildNodes::put);
-
+        prevChildNodes.forEach(temp::put);
+        previousChildNodes.put(previousNode, temp);
     }
 
     private Map<Integer, Integer> findChildNodes(int currentNode) {
@@ -113,6 +116,7 @@ public class ProblemSolver {
 
     private void printHumanReadableNodes() {
         currentNodeWeights.forEach((k, v) -> System.out.print(letterToInteger.get(k) + " = " + v + " | "));
+        System.out.println();
     }
 
     private void printHumanReadableCurrentNode() {
@@ -125,8 +129,14 @@ public class ProblemSolver {
 
     private void printHumanReadablePrevChildNodes() {
         System.out.println("PREV CHILD NODES START for node " + letterToInteger.get(previousNode));
-        previousChildNodes.forEach((k, v) -> System.out.print(letterToInteger.get(k) + " = " + v + " | "));
-        System.out.println("\nPREV CHILD NODES END");
+//        previousChildNodes.forEach((k, v) -> {
+//
+//           System.out.print(letterToInteger.get(k) + " = ");
+//           v.forEach((n, p) -> System.out.print("{" + letterToInteger.get(n) + "=" + p + "}"));
+//            System.out.print(" |");
+//        });
+        System.out.println(previousChildNodes);
+        System.out.println("\nPREV CHILD NODES END\n\n");
 
     }
 

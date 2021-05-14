@@ -33,11 +33,9 @@ public class ProblemSolver {
     private void worker() {
         updateCurrentPath(previousNode);
         updateCurrentNodeWeights(currentNode);
-        while (!currentNodeWeights.containsKey(6)) {
+        while (!currentPath.containsKey(6)) {
             updateState();
         }
-        updateState();
-        updateState();
         printHumanReadablePath();
     }
 

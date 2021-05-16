@@ -31,21 +31,22 @@ public class ProblemSolver {
 
 
     private void worker() {
-        updateCurrentPath(previousNode);
-        updateCurrentNodeWeights(currentNode);
+        updateCurrentPath(previousNode); //update initial path
+        updateCurrentNodeWeights(currentNode); // initial update currentNodes - at this point it will effect only default node
         while (!currentPath.containsKey(6)) {
             updateState();
         }
-        printHumanReadablePath();
+//        printHumanReadablePath();
+        printHumanReadablePrevChildNodes();
     }
 
     private void updateState() {
-        updateNodeTracking();
-        updatePreviousChildNodeMap(previousNode);
-        updateCurrentPath(currentNode);
-        updateNodesMap();
-//        printHumanReadableCurrentNode();
-//        printHumanReadablePath();
+        updateNodeTracking(); //which node will be our current node (based on weights)
+        updatePreviousChildNodeMap(previousNode); // add all child from previous node to vault
+        updateCurrentPath(currentNode); //add path - we're need to track our way
+        updateNodesMap(); //current map with child nodes;
+        printHumanReadableCurrentNode();
+        printHumanReadablePath();
 //        printDebugData(); //debug
     }
 

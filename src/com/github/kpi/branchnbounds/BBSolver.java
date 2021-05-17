@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BBSolver {
+
+    private final String DEFAULT_START_NODE = "a";
+    private final String DEFAULT_END_NODE = "f";
+
     private Graph originGraph;
     private Graph workingGraph;
 
@@ -14,16 +18,13 @@ public class BBSolver {
 
     public BBSolver() {
         configureGraphs();
+        System.out.println((workingGraph.getAL()));
         fixGraph(this.workingGraph);
+        print(workingGraph);
         fixGraph(this.originGraph);
         configureSolver();
         startSolution();
         printCostAndPath();
-//
-//
-        rebalance();
-        startSolution();
-        printCostAndPath();
 
         rebalance();
         startSolution();
@@ -33,7 +34,11 @@ public class BBSolver {
         startSolution();
         printCostAndPath();
 
-        for (int i = 0; i < 5; i++) {
+        rebalance();
+        startSolution();
+        printCostAndPath();
+
+        for (int i = 0; i < 2; i++) {
             rebalance();
             startSolution();
             printCostAndPath();
@@ -44,8 +49,8 @@ public class BBSolver {
     }
 
     private void configureSolver() {
-        setHead("a"); //default head
-        path.put("a", 0); // update path with default values
+        setHead(DEFAULT_START_NODE); //default head
+        path.put(DEFAULT_START_NODE, 0); // update path with default values
     }
 
     private void rebalance() {
@@ -59,7 +64,7 @@ public class BBSolver {
 
         String nextHead;
         String previousHead = "";
-        while (!path.containsKey("g")) {
+        while (!path.containsKey(DEFAULT_END_NODE)) {
             previousHead = head;
             nextHead = findLeastCostChild(head);
             updateWeights(head, nextHead);
@@ -68,7 +73,7 @@ public class BBSolver {
             setHead(nextHead);
 //            break;
         }
-        path.replace("g", workingGraph.getEdge(previousHead).get(head));
+        path.replace(DEFAULT_END_NODE, workingGraph.getEdge(previousHead).get(head));
     }
 
     private void dropLastSucceedBranch() {
@@ -76,7 +81,7 @@ public class BBSolver {
         AtomicReference<String> parentNode = new AtomicReference<>();
         AtomicReference<String> childNode = new AtomicReference<>();
 
-        previousNode.set("a");
+        previousNode.set(DEFAULT_START_NODE);
 
         path.forEach((pathNode, unused) -> {
             if (workingGraph.getAL().get(pathNode).size() == 1
@@ -98,7 +103,7 @@ public class BBSolver {
     }
 
     private void dropBranch(String head) {
-        if (head.equals("a")) return;
+        if (head.equals(DEFAULT_START_NODE)) return;
 
         AtomicReference<String> superN = new AtomicReference<>();
         AtomicReference<String> n = new AtomicReference<>();
@@ -134,7 +139,7 @@ public class BBSolver {
 
 
     private Integer getCurrentNodeWeight(String nextHead) {
-        if (nextHead.equals("g")) {
+        if (nextHead.equals(DEFAULT_END_NODE)) {
             return workingGraph.getEdge(head).get(head);
         }
         else {
@@ -169,8 +174,8 @@ public class BBSolver {
     }
 
     private void configureGraphs() {
-        this.originGraph = new Graph(7);
-        this.workingGraph = new Graph(7);
+        this.originGraph = new Graph(6);
+        this.workingGraph = new Graph(6);
         setupGraph(this.originGraph);
         updateWorkingGraph();
     }
@@ -188,32 +193,48 @@ public class BBSolver {
         workingGraph.getAL().clear();
     }
 
+//    private void setupGraph(Graph g) {
+//        g.setEdge("a", "b", 2);
+//        g.setEdge("a", "c", 4);
+//        g.setEdge("a", "d", 5);
+//
+//        g.setEdge("b", "c", 1);
+//        g.setEdge("b", "e", 5);
+//        g.setEdge("b", "f", 12);
+//
+//        g.setEdge("c", "f", 9);
+//        g.setEdge("c", "g", 18);
+//
+//        g.setEdge("d", "g", 8);
+//
+//        g.setEdge("e", "f", 4);
+//
+//        g.setEdge("f", "g", 1);
+//
+//    }
+
     private void setupGraph(Graph g) {
-        g.setEdge("a", "b", 2);
-        g.setEdge("a", "c", 4);
-        g.setEdge("a", "d", 5);
+        g.setEdge("a", "b", 4);
+        g.setEdge("a", "c", 3);
 
-        g.setEdge("b", "c", 1);
-        g.setEdge("b", "e", 5);
-        g.setEdge("b", "f", 12);
 
+        g.setEdge("b", "c", 4);
+        g.setEdge("b", "e", 4);
+
+        g.setEdge("c", "d", 5);
         g.setEdge("c", "f", 9);
-        g.setEdge("c", "g", 18);
 
-        g.setEdge("d", "g", 8);
+        g.setEdge("d", "f", 1);
 
-        g.setEdge("e", "f", 4);
+        g.setEdge("e", "f", 8);
 
-        g.setEdge("f", "g", 1);
 
     }
 
     private void fixGraph(Graph g) {
         g.getAL().forEach((node, map) -> {
             if (map == null) {
-                Map<String, Integer> tmp = new HashMap<>();
-                tmp.put(node, 0);
-
+                map = new HashMap<>(Map.of(node, 0));
             }
         });
     }

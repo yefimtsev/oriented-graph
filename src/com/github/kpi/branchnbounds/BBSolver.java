@@ -14,14 +14,11 @@ public class BBSolver {
 
     private String head;
 
-    private Map<String, Integer> path = new HashMap<>();
+    private final Map<String, Integer> path = new HashMap<>();
 
     public BBSolver() {
         configureGraphs();
-        System.out.println((workingGraph.getAL()));
-        fixGraph(this.workingGraph);
         print(workingGraph);
-        fixGraph(this.originGraph);
         configureSolver();
         startSolution();
         printCostAndPath();
@@ -92,9 +89,7 @@ public class BBSolver {
             previousNode.set(pathNode);
         });
 
-        originGraph.getAL().forEach((n, map) -> {
-            map.remove(childNode.get());
-        });
+        originGraph.getAL().forEach((n, map) -> map.remove(childNode.get()));
         originGraph.removeVertex(childNode.get());
     }
 
@@ -108,16 +103,14 @@ public class BBSolver {
         AtomicReference<String> superN = new AtomicReference<>();
         AtomicReference<String> n = new AtomicReference<>();
 
-        workingGraph.getAL().forEach((superNode, map) -> {
-                map.forEach((node, weight) -> {
-                    if (workingGraph.getEdge(head).containsKey(node)) {
-                        if (weight > workingGraph.getEdge(head).get(node)) {
-                            superN.set(superNode);
-                            n.set(node);
-                        }
-                    }
-                });
-        });
+        workingGraph.getAL().forEach((superNode, map) -> map.forEach((node, weight) -> {
+            if (workingGraph.getEdge(head).containsKey(node)) {
+                if (weight > workingGraph.getEdge(head).get(node)) {
+                    superN.set(superNode);
+                    n.set(node);
+                }
+            }
+        }));
         if (workingGraph.getAL().containsKey(superN.get()) && workingGraph.getEdge(superN.get()).containsKey(n.get())) {
             workingGraph.getAL().get(superN.get()).remove(n.get());
         }
@@ -183,60 +176,27 @@ public class BBSolver {
     private void updateWorkingGraph() {
         workingGraph.getAL().clear();
         Map<String, Map<String, Integer>> tmp = originGraph.getAL();
-        tmp.forEach((node, map) -> {
-
-            workingGraph.getAL().put(node, new HashMap<>(map));
-        });
+        tmp.forEach((node, map) -> workingGraph.getAL().put(node, new HashMap<>(map)));
     }
-
-    private void setupWorkingGraph() {
-        workingGraph.getAL().clear();
-    }
-
-//    private void setupGraph(Graph g) {
-//        g.setEdge("a", "b", 2);
-//        g.setEdge("a", "c", 4);
-//        g.setEdge("a", "d", 5);
-//
-//        g.setEdge("b", "c", 1);
-//        g.setEdge("b", "e", 5);
-//        g.setEdge("b", "f", 12);
-//
-//        g.setEdge("c", "f", 9);
-//        g.setEdge("c", "g", 18);
-//
-//        g.setEdge("d", "g", 8);
-//
-//        g.setEdge("e", "f", 4);
-//
-//        g.setEdge("f", "g", 1);
-//
-//    }
 
     private void setupGraph(Graph g) {
-        g.setEdge("a", "b", 4);
-        g.setEdge("a", "c", 3);
+        g.setEdge("a", "b", 2);
+        g.setEdge("a", "c", 4);
+        g.setEdge("a", "d", 5);
 
+        g.setEdge("b", "c", 1);
+        g.setEdge("b", "e", 5);
+        g.setEdge("b", "f", 12);
 
-        g.setEdge("b", "c", 4);
-        g.setEdge("b", "e", 4);
-
-        g.setEdge("c", "d", 5);
         g.setEdge("c", "f", 9);
+        g.setEdge("c", "g", 18);
 
-        g.setEdge("d", "f", 1);
+        g.setEdge("d", "g", 8);
 
-        g.setEdge("e", "f", 8);
+        g.setEdge("e", "f", 4);
 
+        g.setEdge("f", "g", 1);
 
-    }
-
-    private void fixGraph(Graph g) {
-        g.getAL().forEach((node, map) -> {
-            if (map == null) {
-                map = new HashMap<>(Map.of(node, 0));
-            }
-        });
     }
 
     private void print(Graph graph) {

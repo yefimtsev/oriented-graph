@@ -8,7 +8,7 @@ public class BBSolver {
 
     private final String DEFAULT_START_NODE = "a";
     private final String DEFAULT_END_NODE = "g";
-
+    private final int NUMBER_OF_NODES = 7;
     private Graph originGraph;
     private Graph workingGraph;
 
@@ -24,13 +24,12 @@ public class BBSolver {
     public BBSolver() {
         configureGraphs();
         configureSolver();
-        print(workingGraph);
-
         do {
             findLeastCostPath();
             updateSolutionFlow();
-        } while (isSamePath());
+        } while (!isSamePath());
 
+        getLeastCostResult();
     }
 
     private boolean isSamePath() {
@@ -48,7 +47,7 @@ public class BBSolver {
                 min = entry;
             }
         }
-        System.out.printf("Shortest path is [ %s ] and it costs [ %d ]\n", min.getKey(), min.getValue());
+        System.out.printf("Shortest path is [ %s ] \nTotal cost is [ %d ]\n", min.getKey(), min.getValue());
     }
 
     private String getStringPath() {
@@ -68,7 +67,7 @@ public class BBSolver {
 
     private void updateSolutionFlow() {
         dropLastSucceedBranch();
-        nullifyPath();
+        updatePaths();
         updateWorkingGraph();
         configureSolver();
     }
@@ -76,6 +75,7 @@ public class BBSolver {
     private void findLeastCostPath() {
         String nextHead;
         String previousHead = "";
+        previousPath = currentPath;
         while (!path.containsKey(DEFAULT_END_NODE)) {
             previousHead = head;
             nextHead = findLeastCostChild(head);
@@ -85,6 +85,7 @@ public class BBSolver {
             setHead(nextHead);
         }
         path.replace(DEFAULT_END_NODE, workingGraph.getEdge(previousHead).get(head));
+        currentPath = getStringPath();
         writePaths();
     }
 
@@ -93,21 +94,26 @@ public class BBSolver {
         AtomicReference<String> parentNode = new AtomicReference<>();
         AtomicReference<String> childNode = new AtomicReference<>();
 
+        if (workingGraph.getAL().get(previousNode.get()) == null) {
+            previousNode.set(DEFAULT_START_NODE);
+        }
+
         path.forEach((pathNode, unused) -> {
             if (workingGraph.getAL().get(pathNode).size() == 1
-            && workingGraph.getAL().get(previousNode.get()).size() > 1) {
+                    && workingGraph.getAL().get(previousNode.get()).size() > 1) {
+
                 parentNode.set(previousNode.get());
                 childNode.set(pathNode);
             }
             previousNode.set(pathNode);
         });
 
+
         originGraph.getAL().forEach((n, map) -> map.remove(childNode.get()));
         originGraph.removeVertex(childNode.get());
     }
 
-    private void nullifyPath() {
-        System.out.println("Path before clear: " + path);
+    private void updatePaths() {
         path.clear();
     }
 
@@ -182,9 +188,10 @@ public class BBSolver {
     }
 
     private void configureGraphs() {
-        this.originGraph = new Graph(6);
-        this.workingGraph = new Graph(6);
+        this.originGraph = new Graph(NUMBER_OF_NODES);
+        this.workingGraph = new Graph(NUMBER_OF_NODES);
         setupGraph(this.originGraph);
+//        exampleGraph(this.originGraph);
         updateWorkingGraph();
     }
 
@@ -213,6 +220,27 @@ public class BBSolver {
         g.setEdge("f", "g", 1);
 
         g.addVertex("g");
+
+    }
+
+    private void exampleGraph(Graph g) {
+        g.setEdge("a", "b", 4);
+        g.setEdge("a", "c", 3);
+
+
+        g.setEdge("b", "c", 4);
+        g.setEdge("b", "e", 4);
+
+        g.setEdge("c", "d", 5);
+        g.setEdge("c", "f", 9);
+
+        g.setEdge("d", "f", 1);
+
+        g.setEdge("e", "f", 8);
+
+        g.addVertex("f");
+
+
 
     }
 

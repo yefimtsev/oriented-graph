@@ -7,42 +7,58 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BBSolver {
 
     private final String DEFAULT_START_NODE = "a";
-    private final String DEFAULT_END_NODE = "f";
+    private final String DEFAULT_END_NODE = "g";
 
     private Graph originGraph;
     private Graph workingGraph;
 
     private String head;
 
+    private String currentPath;
+    private String previousPath;
+
+
     private final Map<String, Integer> path = new HashMap<>();
+    private final Map<String, Integer> finalPaths = new HashMap<>();
 
     public BBSolver() {
         configureGraphs();
-        print(workingGraph);
         configureSolver();
-        startSolution();
-        printCostAndPath();
+        print(workingGraph);
 
-        rebalance();
-        startSolution();
-        printCostAndPath();
+        do {
+            findLeastCostPath();
+            updateSolutionFlow();
+        } while (isSamePath());
 
-        rebalance();
-        startSolution();
-        printCostAndPath();
+    }
 
-        rebalance();
-        startSolution();
-        printCostAndPath();
+    private boolean isSamePath() {
+        return currentPath.equals(previousPath);
+    }
 
-        for (int i = 0; i < 2; i++) {
-            rebalance();
-            startSolution();
-            printCostAndPath();
+    private void writePaths() {
+        finalPaths.put(getStringPath(), path.get(DEFAULT_END_NODE));
+    }
 
+    private void getLeastCostResult() {
+        Map.Entry<String, Integer> min = null;
+        for (Map.Entry<String, Integer> entry : finalPaths.entrySet()) {
+            if (min == null || min.getValue() > entry.getValue()) {
+                min = entry;
+            }
         }
-        print(originGraph);
+        System.out.printf("Shortest path is [ %s ] and it costs [ %d ]\n", min.getKey(), min.getValue());
+    }
 
+    private String getStringPath() {
+        AtomicReference<String> path = new AtomicReference<>("");
+
+        this.path.keySet().forEach(s -> path.set(path.get().concat(s.toUpperCase() + "->")));
+
+        path.set(path.get().substring(0, path.get().length() - 2));
+
+        return path.get();
     }
 
     private void configureSolver() {
@@ -50,15 +66,14 @@ public class BBSolver {
         path.put(DEFAULT_START_NODE, 0); // update path with default values
     }
 
-    private void rebalance() {
+    private void updateSolutionFlow() {
         dropLastSucceedBranch();
         nullifyPath();
         updateWorkingGraph();
         configureSolver();
     }
 
-    private void startSolution() {
-
+    private void findLeastCostPath() {
         String nextHead;
         String previousHead = "";
         while (!path.containsKey(DEFAULT_END_NODE)) {
@@ -68,17 +83,15 @@ public class BBSolver {
             updatePath(nextHead, getCurrentNodeWeight(nextHead));
             dropBranch(head);
             setHead(nextHead);
-//            break;
         }
         path.replace(DEFAULT_END_NODE, workingGraph.getEdge(previousHead).get(head));
+        writePaths();
     }
 
     private void dropLastSucceedBranch() {
         AtomicReference<String> previousNode = new AtomicReference<>();
         AtomicReference<String> parentNode = new AtomicReference<>();
         AtomicReference<String> childNode = new AtomicReference<>();
-
-        previousNode.set(DEFAULT_START_NODE);
 
         path.forEach((pathNode, unused) -> {
             if (workingGraph.getAL().get(pathNode).size() == 1
@@ -94,6 +107,7 @@ public class BBSolver {
     }
 
     private void nullifyPath() {
+        System.out.println("Path before clear: " + path);
         path.clear();
     }
 
@@ -111,7 +125,8 @@ public class BBSolver {
                 }
             }
         }));
-        if (workingGraph.getAL().containsKey(superN.get()) && workingGraph.getEdge(superN.get()).containsKey(n.get())) {
+        if (workingGraph.getAL().containsKey(superN.get())
+                && workingGraph.getEdge(superN.get()).containsKey(n.get())) {
             workingGraph.getAL().get(superN.get()).remove(n.get());
         }
     }
@@ -196,6 +211,8 @@ public class BBSolver {
         g.setEdge("e", "f", 4);
 
         g.setEdge("f", "g", 1);
+
+        g.addVertex("g");
 
     }
 

@@ -31,10 +31,6 @@ class Graph {
         }
     }
 
-    public Graph(Graph g) {
-        adjacencyList = new HashMap<String, Map<String, Integer>>(g.getAL());
-    }
-
     public void setEdge(String edgeNode, String childNode, int weight) {    //method to add an edge
         Map<String, Integer> edges = adjacencyList.get(edgeNode);
         edges.put(childNode, weight);

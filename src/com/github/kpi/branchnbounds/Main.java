@@ -15,6 +15,10 @@ package com.github.kpi.branchnbounds;
 public class Main {
     public static void main(String[] args) {
 //        new ProblemSolver();
+        long startTime = System.nanoTime();
         new BBSolver();
+        long stopTime = System.nanoTime();
+        double elapsedTimeInSecond = (double) (stopTime - startTime) / 1_000_000_000;
+        System.out.println(elapsedTimeInSecond + " seconds");
     }
 }
